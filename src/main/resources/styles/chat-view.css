@@ -1,0 +1,66 @@
+.owner-message {
+    -fx-background-color: #044c44;
+    -fx-padding: 8px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+.sender-message {
+    -fx-background-color: #1565C0;
+    -fx-padding: 8px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+/* Make the entire ListView background transparent */
+.list-view {
+    -fx-background-color: transparent;
+}
+
+/* Remove the background color for the internal scroll pane */
+.list-view .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+/* Make each individual cell in the ListView transparent */
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-border-color: transparent; /* if you want to remove any borders */
+}
+
+/* chat.css */
+#mainPane {
+    -fx-background-color: #E0E0E0; /* Replace with your desired color, e.g., light blue */
+    /*-fx-background-image: url("../images/bg1.png"); !* Use relative path or absolute URL *!*/
+    /*-fx-background-repeat: no-repeat;*/
+    /*-fx-background-size: cover;*/
+    /*-fx-background-position: center center;*/
+}
+
+/* chat.css */
+.chat-bubble {
+    -fx-background-color: #f1f0f0; /* default background */
+    -fx-background-radius: 10px;
+    -fx-padding: 8px;
+}
+
+.owner-message {
+    -fx-background-color: #044c44;
+}
+
+.sender-message {
+    -fx-background-color: #1565C0;
+}
+
+.download-button {
+    -fx-background-color: #1E90FF; /* Modern blue look */
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+    -fx-padding: 4px 8px;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+
