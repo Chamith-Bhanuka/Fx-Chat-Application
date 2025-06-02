@@ -4,22 +4,24 @@ import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import lk.ijse.mychat.mychatfxchatapplication.ChatClient;
 import lk.ijse.mychat.mychatfxchatapplication.ChatMessage;
 import lk.ijse.mychat.mychatfxchatapplication.MessageCell;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.util.Base64;
 import java.util.ResourceBundle;
 
 public class ChatController implements ChatClient.MessageListener, Initializable {
@@ -119,6 +121,8 @@ public class ChatController implements ChatClient.MessageListener, Initializable
             }
         });
 
+        Font emojiFont = Font.font("Segoe UI Emoji", 14);
+        messageField.setFont(emojiFont);
     }
 
     @FXML
@@ -165,5 +169,45 @@ public class ChatController implements ChatClient.MessageListener, Initializable
                 ex.printStackTrace();
             }
         }
+    }
+
+    @FXML
+    void onEmojiSendClick(MouseEvent event) {
+        Stage emojiStage = new Stage();
+        GridPane emojiGrid = new GridPane();
+
+        // Load Unicode emojis dynamically
+        String[] emojiList = {
+                "😀", "😂", "😊", "😍", "🥳", "😎", "🤔", "🙄", "😡", "💯", "🔥", "🎉",
+                "🚀", "🎶", "🎂", "🍕", "🍔", "🍎", "⚽", "🎨"
+        };
+
+        int row = 0, col = 0;
+        for (String emoji : emojiList) {
+            Button emojiButton = new Button(emoji);
+            emojiButton.setFont(Font.font("Segoe UI Emoji", 20));
+
+            emojiButton.setOnAction(e -> {
+                messageField.appendText(emojiButton.getText()); // Insert emoji into text field
+                emojiStage.close(); // Close popup after selection
+            });
+
+            emojiGrid.add(emojiButton, col, row);
+            col++;
+            if (col > 4) { col = 0; row++; }
+        }
+
+        Scene scene = new Scene(emojiGrid);
+        emojiStage.setScene(scene);
+
+        // Get main stage position
+        Stage mainStage = (Stage) fileButton.getScene().getWindow();
+        emojiStage.setX(mainStage.getX()); // Align to left of main stage
+        emojiStage.setY(mainStage.getY() + mainStage.getHeight() - 210); // Adjust position slightly up
+        emojiStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/emoji.png")));
+
+
+        emojiStage.show();
+
     }
 }
