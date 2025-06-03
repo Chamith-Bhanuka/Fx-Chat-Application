@@ -21,11 +21,10 @@ public class MessageCell extends ListCell<ChatMessage> {
             setText(null);
             setGraphic(null);
         } else {
-            // Outer container for the entire cell
             HBox outerContainer = new HBox();
             outerContainer.setMaxWidth(400);
             outerContainer.setSpacing(5);
-            // If current user's message, align to right; otherwise to left.
+
             if (message.getSender().equals(message.getCurrentUser())) {
                 outerContainer.setAlignment(Pos.CENTER_RIGHT);
             } else {
@@ -33,12 +32,10 @@ public class MessageCell extends ListCell<ChatMessage> {
             }
 
             if (message.isFile()) {
-                // Create a VBox to act as the "chat bubble" for file messages.
                 VBox bubbleContainer = new VBox();
                 bubbleContainer.setSpacing(5);
-                // Add a common CSS class for the bubble.
                 bubbleContainer.getStyleClass().add("chat-bubble");
-                // Add different colors for sender/receiver bubbles.
+
                 if (message.getSender().equals(message.getCurrentUser())) {
                     bubbleContainer.getStyleClass().add("owner-message");
                 } else {
@@ -46,7 +43,6 @@ public class MessageCell extends ListCell<ChatMessage> {
                 }
 
                 String lowerName = message.getFilename().toLowerCase();
-                // If it's an image file, display a preview.
                 if (lowerName.endsWith(".png") || lowerName.endsWith(".jpg") ||
                         lowerName.endsWith(".jpeg") || lowerName.endsWith(".gif")) {
 
@@ -56,14 +52,12 @@ public class MessageCell extends ListCell<ChatMessage> {
                     imageView.setPreserveRatio(true);
                     bubbleContainer.getChildren().add(imageView);
                 } else {
-                    // For other file types, display a label.
                     Label fileLabel = new Label(message.getFilename());
                     fileLabel.setWrapText(true);
                     fileLabel.setMaxWidth(300);
                     bubbleContainer.getChildren().add(fileLabel);
                 }
 
-                // Only for incoming file messages (receiver's side), add a Download button.
                 if (!message.getSender().equals(message.getCurrentUser())) {
                     Button downloadBtn = new Button("Download");
                     downloadBtn.getStyleClass().add("download-button");
@@ -83,20 +77,47 @@ public class MessageCell extends ListCell<ChatMessage> {
                 }
 
                 outerContainer.getChildren().add(bubbleContainer);
+
             } else {
-                // For text messages, create a label and apply the bubble style.
+                VBox textContainer = new VBox();
+                textContainer.setSpacing(2);
+
+                // ✅ Only show sender name in group chat, if it's the first in a sequence
+                if (!message.getSender().equals(message.getCurrentUser()) &&
+                        !message.getSender().equalsIgnoreCase("Private")) {
+
+                    int index = getIndex();
+                    String previousSender = null;
+                    if (index > 0 && index < getListView().getItems().size()) {
+                        ChatMessage prevMsg = getListView().getItems().get(index - 1);
+                        previousSender = prevMsg.getSender();
+                    }
+
+                    if (previousSender == null || !previousSender.equals(message.getSender())) {
+                        Label senderLabel = new Label(message.getSender());
+                        senderLabel.getStyleClass().add("sender-name");
+                        textContainer.getChildren().add(senderLabel);
+                    }
+                }
+
                 Label messageLabel = new Label(message.getContent());
                 messageLabel.setWrapText(true);
                 messageLabel.setMaxWidth(300);
                 messageLabel.getStyleClass().add("chat-bubble");
+
                 if (message.getSender().equals(message.getCurrentUser())) {
                     messageLabel.getStyleClass().add("owner-message");
                 } else {
                     messageLabel.getStyleClass().add("sender-message");
                 }
-                outerContainer.getChildren().add(messageLabel);
+
+                textContainer.getChildren().add(messageLabel);
+                outerContainer.getChildren().add(textContainer);
             }
+
             setGraphic(outerContainer);
         }
     }
+
+
 }

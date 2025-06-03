@@ -63,4 +63,10 @@
     -fx-border-color: transparent;
 }
 
+.sender-name {
+    -fx-font-size: 10px;
+    -fx-text-fill: #b4b40b;
+    -fx-font-weight: bold;
+}
+
 

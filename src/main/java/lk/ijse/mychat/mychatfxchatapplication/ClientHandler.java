@@ -1,5 +1,7 @@
 package lk.ijse.mychat.mychatfxchatapplication;
 
+import lk.ijse.mychat.mychatfxchatapplication.util.EncryptionUtil;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,19 +33,22 @@ public class ClientHandler implements Runnable {
 
             if (loginMessage != null && loginMessage.startsWith("LOGIN:")) {
                 username = loginMessage.substring(6);
-                server.broadcast("Server: " + username + " joined the chat", this);
+                String loginNotice = "Server: " + username + " joined the chat";
+                server.broadcast("ENCRYPTED:Server:" + EncryptionUtil.encrypt(loginNotice), this);
             }
 
             String message;
 
             while ((message = in.readLine()) != null) {
-                System.out.println(username + " : " + message);
-                server.broadcast(username + " : " + message, this);
+                String encrypted = EncryptionUtil.encrypt(message);
+                System.out.println(username + ": (RAW) - " + message + "  <--> (Encrypted) - " + encrypted);
+                server.broadcast("ENCRYPTED:" + username + ":" + encrypted, this);
             }
 
 
         } catch (IOException e) {
             System.out.println("Connection lost with " + username);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             try {
@@ -53,6 +58,7 @@ public class ClientHandler implements Runnable {
             }
         }
     }
+
 
     public void sendMessage(String message) {
         out.println(message);

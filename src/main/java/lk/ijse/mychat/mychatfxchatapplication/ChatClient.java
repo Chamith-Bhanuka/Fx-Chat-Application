@@ -1,5 +1,7 @@
 package lk.ijse.mychat.mychatfxchatapplication;
 
+import lk.ijse.mychat.mychatfxchatapplication.util.EncryptionUtil;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -24,7 +26,7 @@ public class ChatClient {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            out.println("LOGIN" + username);
+            out.println("LOGIN:" + username);
 
             new Thread(new IncomingReader()).start();
         } catch (IOException e) {
@@ -33,17 +35,38 @@ public class ChatClient {
     }
 
     public void sendMessage(String message) {
-        out.println(message);
+        try {
+//            String encrypted = EncryptionUtil.encrypt(message);
+//            out.println(encrypted);
+            out.println(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private class IncomingReader implements Runnable {
         @Override
         public void run() {
             String message;
-
             try {
                 while ((message = in.readLine()) != null) {
-                    if (listener != null) {
+                    if (message.startsWith("ENCRYPTED:")) {
+                        // Format: ENCRYPTED:username:encryptedText
+                        String[] parts = message.split(":", 3);
+                        if (parts.length == 3) {
+                            String sender = parts[1];
+                            String encryptedText = parts[2];
+
+                            try {
+                                String decryptedText = EncryptionUtil.decrypt(encryptedText);
+                                listener.onMessageReceived(sender + " : " + decryptedText);
+                            } catch (Exception e) {
+                                System.err.println("Failed to decrypt message: " + message);
+                                e.printStackTrace();
+                            }
+                        }
+                    } else {
+                        // Fallback if message isn't encrypted
                         listener.onMessageReceived(message);
                     }
                 }
@@ -51,7 +74,9 @@ public class ChatClient {
                 e.printStackTrace();
             }
         }
+
     }
+
 
     public void closeConnection() {
         try {
